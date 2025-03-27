@@ -33,6 +33,7 @@ class EnemySwarm(private val nRows:Int, private val nCols:Int) {
     EnemyBuffer((math.random*EnemyBuffer.length).toInt).shoot()
    }
 
+
   def enemyHit(A:Sprite): Boolean = {
     val plp = SpriteList.SpaceCraft //Player img pic
     val pbp = SpriteList.GamerBullet // player bullet pic, need to specify that only player bullets have this action
@@ -73,14 +74,14 @@ class EnemySwarm(private val nRows:Int, private val nCols:Int) {
       wasBumped
    }
 
-  def swarmMove() {EnemyBuffer.foreach(_.move()) }
+  def swarmMove(speedMultiplier:Double) = {EnemyBuffer.foreach(_.move(speedMultiplier)) }
 
 
    def isEmpty():Boolean = {
     var empty = false
     if(EnemyBuffer.length == 0)
     empty = true
-    empty
+    return empty
    }
 
 }

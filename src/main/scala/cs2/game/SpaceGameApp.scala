@@ -47,23 +47,15 @@ var gsStack = new Stack[GameState]()
       content = canvas
       val g = canvas.graphicsContext2D
 
-        //val TitleScreen = g.setTextAlign(TextAlignment.Center);g.setFill(CustomColors.background);g.fillRect(0,0, canvas.width.value,canvas.height.value);g.drawImage(SpriteList.saturn,0,0);g.setStroke(Color.GhostWhite);g.setFont(FontsLoaded.GemunuLibreEB);g.strokeText("Space Invaders Over Saturn", canvas.width.value/2,canvas.height.value-600, 600);g.fillText("Space Invaders Over Saturn", canvas.width.value/2,canvas.height.value-600, 600);g.setFont(FontsLoaded.GemunuLibreMed);g.setFill(Color.LightYellow);g.fillText("Press Enter Key to Play", canvas.width.value/2, canvas.height.value-200, 300)
-        //val Caption = g.setFont(FontsLoaded.GemunuLibreMed);g.setFill(Color.LightYellow);g.fillText("Press Enter Key to Play", canvas.width.value/2, canvas.height.value-200, 200)
-        //val PauseScreen = g.setFont(FontsLoaded.GemunuLibreReg); g.setFill(CustomColors.pausescreenbg); g.fillRect(0, 0, canvas.width.value, canvas.height.value);g.strokeText("Quit Game?", canvas.width.value / 2, canvas.height.value - 550,400);g.setFont(FontsLoaded.GemunuLibreMed);g.strokeText("Press Enter to Continue or N Key to Start a New Game", canvas.width.value / 2, canvas.height.value - 250, 500)
-        //val LoseScreen = g.setFill(CustomColors.background);g.fillRect(0,0, canvas.width.value, canvas.height.value);g.drawImage(SpriteList.DeadBackground, 0, 0);g.setFont(FontsLoaded.GemunuLibreEB);g.setFill(Color.Black);g.fillText("You Lose", canvas.width.value/2, 2*canvas.height.value/3);g.setFont(FontsLoaded.GemunuLibreMed);g.fillText("Press N Key to Start a New Game", canvas.width.value / 2, canvas.height.value - 200, 500)
       var showStartScreen = true
       var beginGame = false
       var showPauseScreen = false
       var showDeadScreen = false
+      var showWaveClearScreen = false
+      var showWinScreen = false
 
-      
-
-      
-      //var TimeBoard = g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText(Time.toString(), canvas.width.value/2 -50, canvas.height.value - 750, 100)
-      //var ScoreBoard = g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText(Score.toString(), canvas.width.value/3, canvas.height.value -750, 300)
-      //var LifeBoard = g.drawImage(SpriteList.Heart, 2*canvas.width.value/3 - 50, canvas.height.value - 800);g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText(Lives.toString(), 2*canvas.width.value/3+10, canvas.height.value -750, 300)
+    
       canvas.requestFocus()
-
 
       canvas.onKeyPressed = (e: KeyEvent) => {
         if (e.code == KeyCode.Enter) {
@@ -71,9 +63,11 @@ var gsStack = new Stack[GameState]()
           gs.ScoreDisplay = true
           gs.LivesDisplay = true
           gs.TimeDisplay = true
+          showWinScreen = false
           showPauseScreen = false
           showDeadScreen = false
           showStartScreen = false
+          showWaveClearScreen = false
         }
 
         if (e.code == KeyCode.N) {
@@ -85,8 +79,11 @@ var gsStack = new Stack[GameState]()
           showDeadScreen = false
           showStartScreen = false
           showPauseScreen = false
+          showWaveClearScreen = false
+          showWinScreen = false
           gs.Time = 100
           gs.Lives = 5
+          gs.WaveCount = 0
           gs.killcounter = 0
           gs.bulletinterception = 0
           rewindcounter = 0
@@ -97,6 +94,8 @@ var gsStack = new Stack[GameState]()
           beginGame = false
           showDeadScreen = false
           showStartScreen = false
+          showWaveClearScreen = false
+          showWinScreen = false
           gs.LivesDisplay = false
           gs.ScoreDisplay = false
           gs.TimeDisplay = false
@@ -186,44 +185,46 @@ var gsStack = new Stack[GameState]()
       }
 
 
-      //var killcounter = 0
-      //var bulletinterception = 0
-      
       var enemyslowdown = 0
       var machinegun = -15
       var slowdown = machinegun
       var rewindcounter:Double = 0
       val timer = AnimationTimer(t => {
 
-        if (showStartScreen == true) {
-          g.setTextAlign(TextAlignment.Center);g.setFill(CustomColors.background);g.fillRect(0, 0, canvas.width.value, canvas.height.value);g.drawImage(SpriteList.saturn, 0, 0); g.setStroke(Color.GhostWhite);g.setFont(FontsLoaded.GemunuLibreEB);g.strokeText("Space Invaders Over Saturn", canvas.width.value / 2, canvas.height.value - 600, 600);g.fillText("Space Invaders Over Saturn", canvas.width.value / 2, canvas.height.value - 600, 600); g.setFont(FontsLoaded.GemunuLibreMed);g.setFill(Color.LightYellow);g.fillText("Press Enter Key to Play", canvas.width.value / 2, canvas.height.value - 200, 300) 
+        if (showStartScreen == true && showPauseScreen == false) {
+          g.setTextAlign(TextAlignment.Center);g.setFill(CustomColors.background);g.fillRect(0, 0, canvas.width.value, canvas.height.value);g.drawImage(SpriteList.Saturn, 0, 0); g.setStroke(Color.GhostWhite);g.setFont(FontsLoaded.GemunuLibreEB);g.strokeText("Space Invaders Over Saturn", canvas.width.value / 2, canvas.height.value - 600, 600);g.fillText("Space Invaders Over Saturn", canvas.width.value / 2, canvas.height.value - 600, 600); g.setFont(FontsLoaded.GemunuLibreMed);g.setFill(Color.LightYellow);g.fillText("Press Enter Key to Play", canvas.width.value / 2, canvas.height.value - 200, 300) 
 
           //copied command of TitleScreen
         }
-        
+        if (showPauseScreen == true) {
+            g.setFont(FontsLoaded.GemunuLibreReg); g.setFill(CustomColors.pausescreenbg); g.fillRect(0, 0, canvas.width.value, canvas.height.value);g.strokeText("Quit Game?", canvas.width.value / 2, canvas.height.value - 550,400);g.setFont(FontsLoaded.GemunuLibreMed);g.strokeText("Press Enter to Continue or N Key to Start a New Game", canvas.width.value / 2, canvas.height.value - 250, 500)
+        }
 
 
-        if(!KeysTrackedSet.contains(KeyCode.R)){
+        else if(!KeysTrackedSet.contains(KeyCode.R) && !showStartScreen){
         
           
 
         if (beginGame) {
-    /*Background*/ g.drawImage(SpriteList.saturn, 0, 0)
-    /*Score*/      g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText("Score: "+gs.Score.toString(), canvas.width.value/3-220, canvas.height.value -750, 300)
-    /*Hearts*/     g.drawImage(SpriteList.Heart, 2*canvas.width.value/3 - 350, canvas.height.value - 785);g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText(gs.Lives.toString(), 2*canvas.width.value/3-270, canvas.height.value -750, 300)
-    /*Time*/       g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText(gs.Time.toString(), canvas.width.value/2 -250, canvas.height.value - 750, 100)
-    /*PowerBar*/   g.setFont(FontsLoaded.GemunuLibreExLi);g.setFill(Color.GhostWhite);g.fillText("Rewind Power Remaining: ", 3*canvas.width.value/4- 200, canvas.height.value-750, 275);g.setFill(Color.DarkRed);g.fillRect(78*canvas.width.value/100-100, canvas.height.value -780, (350*(rewindcounter/6000.0))-10, canvas.height.value-763);g.setStroke(Color.SkyBlue);g.strokeRect(78*canvas.width.value/100 -100, canvas.height.value -780, (350*(rewindcounter/6000.0))-10, canvas.height.value-763)
-          enemyslowdown += 1
+    /*Background*/  g.drawImage(SpriteList.Saturn, 0, 0)
+    /*Score*/      g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText("Score: "+gs.Score.toString(), canvas.width.value/3-330, canvas.height.value -750, 300)
+    /*Hearts*/     g.drawImage(SpriteList.Heart, 2*canvas.width.value/3 - 500, canvas.height.value - 785);g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText(gs.Lives.toString(), 2*canvas.width.value/3-420, canvas.height.value -750, 300)
+    /*WavesCleared*/g.fillText("Waves Cleared: " + gs.WaveCount.toString(), 2*canvas.width.value/3-270, canvas.height.value - 750, 200)
+    /*Time*/       g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText("Time: "+gs.Time.toString(), canvas.width.value/2 -375, canvas.height.value - 750, 120)
+/*PowerBar*/   g.setFont(FontsLoaded.GemunuLibreExLi);g.setFill(Color.GhostWhite);g.fillText("Rewind Power Remaining: ", 3*canvas.width.value/4 - 100, canvas.height.value-750, 275);g.setFill(Color.DarkRed);g.fillRect(78*canvas.width.value/100, canvas.height.value -780, (250*(rewindcounter/6000.0)), canvas.height.value-763);g.setStroke(Color.SkyBlue);g.strokeRect(78*canvas.width.value/100, canvas.height.value -780, (250*(rewindcounter/6000.0)), canvas.height.value-763)
 
-          gs.Gamer.display(g)
-          gs.Swarm.display(g)
-          gs.Swarm.swarmMove()
-          gs.count+=1
-        
+        gs.Gamer.display(g)
+        gs.Swarm.display(g)
+        gs.Swarm.swarmMove(gs.calculateEnemySpeedMultiplier());
+        gs.count+=1
+        enemyslowdown += gs.calculateShootingSpeedFactor().toInt;
+
         if(rewindcounter >= 0){
         if(rewindcounter <= 5998){
           rewindcounter+=1
         }
+
+        
         if(rewindcounter == 5999){
           rewindcounter = 5999
         }
@@ -232,7 +233,7 @@ var gsStack = new Stack[GameState]()
           
             /*if(escape >= 1){
                     g.setFill(CustomColors.pausescreenbg);g.fillRect(0,0, canvas.width.value, canvas.height.value);g.strokeText("Quit Game?", canvas.width.value/2, canvas.height.value-550, 400)*/ // THIS IS PAUSE SCREEN CODE
-                if (KeysTrackedSet.contains(KeyCode.Left)) {
+        if (KeysTrackedSet.contains(KeyCode.Left)) {
           gs.Gamer.moveLeft()
         }
         if (KeysTrackedSet.contains(KeyCode.Right)) {
@@ -266,11 +267,27 @@ var gsStack = new Stack[GameState]()
         //}
         //println(KeysTrackedSet.contains(KeyCode.R))
         }
-        //println(gs.count)
-        // println(Gamer.initPos.x.toString())
-        // println(Gamer.initPos.y.toString())
-        if (showPauseScreen) {
-            g.setFont(FontsLoaded.GemunuLibreReg); g.setFill(CustomColors.pausescreenbg); g.fillRect(0, 0, canvas.width.value, canvas.height.value);g.strokeText("Quit Game?", canvas.width.value / 2, canvas.height.value - 550,400);g.setFont(FontsLoaded.GemunuLibreMed);g.strokeText("Press Enter to Continue or N Key to Start a New Game", canvas.width.value / 2, canvas.height.value - 250, 500)
+
+        
+
+        if (showWaveClearScreen) {
+          // Display the "Wave Cleared" screen
+          g.setFont(FontsLoaded.GemunuLibreReg)
+          // g.setFill(CustomColors.background)
+          // g.fillRect(0, 0, canvas.width.value, canvas.height.value)
+          g.strokeText("Wave Complete!", canvas.width.value / 2, canvas.height.value - 550, 400)
+          g.setFont(FontsLoaded.GemunuLibreMed)
+          g.strokeText("Get ready for the next wave!", canvas.width.value / 2, canvas.height.value - 250, 500)
+          gs.waveClearTimer +=1
+          if (gs.waveClearTimer >= 180) { // Assuming 60 FPS, this is a 3-second delay
+            showWaveClearScreen = false
+            gs.waveClearTimer = 0
+            gs.Swarm = new EnemySwarm(6, 3)
+            gs.Swarm.display(g)
+          }
+        } else {
+          gs.Swarm.display(g)
+          gs.Swarm.swarmMove(gs.calculateEnemySpeedMultiplier);
         }
 
          if (gs.Lives == 0 || gs.Time == 0) {
@@ -280,6 +297,7 @@ var gsStack = new Stack[GameState]()
             gs.LivesDisplay = false
             gs.ScoreDisplay = false
             gs.TimeDisplay = false
+            showWinScreen = false
             showStartScreen = false
             rewindcounter = 0
         }
@@ -287,6 +305,33 @@ var gsStack = new Stack[GameState]()
         if (showDeadScreen) {
             g.setFill(CustomColors.background);g.fillRect(0,0, canvas.width.value, canvas.height.value);g.drawImage(SpriteList.DeadBackground, 0, 0);g.setFont(FontsLoaded.GemunuLibreEB);g.setFill(Color.Black);g.fillText("You Lose", canvas.width.value/2, 2*canvas.height.value/3);g.setFont(FontsLoaded.GemunuLibreMed);g.fillText("Press N Key to Start a New Game", canvas.width.value / 2, canvas.height.value - 200, 500)
         }   
+        if (gs.WaveCount == 5){
+          showWinScreen = true
+        }
+        if (showWinScreen) {
+          g.setFill(Color.Black)
+          g.fillRect(0, 0, canvas.width.value, canvas.height.value) // Optional: clear background
+
+          // Set font and color for "You Win" message
+          g.setFont(FontsLoaded.GemunuLibreLight)
+          g.setFill(Color.Gold)
+          g.fillText("You Win!", canvas.width.value / 2, canvas.height.value / 2 - 100)  // Adjust text position
+
+          // Show score or other details if needed
+          g.setFont(FontsLoaded.GemunuLibreLight)
+          g.setFill(Color.White)
+          g.fillText(s"Final Score: ${gs.Score}", canvas.width.value / 2, canvas.height.value / 2)
+
+          g.drawImage(SpriteList.Trophy, canvas.width.value / 2 - 160 , canvas.height.value / 2 +80) // Example image
+          
+          
+          g.setFont(FontsLoaded.GemunuLibreLight)
+          g.setFill(Color.White)
+          g.fillText("Press N to Restart", canvas.width.value / 2, canvas.height.value / 2 + 100)
+          beginGame = false
+          showPauseScreen = false
+          showStartScreen = false
+        }
 
         if(gs.count > 0){
             gs.count = -60
@@ -294,7 +339,9 @@ var gsStack = new Stack[GameState]()
         }
         if (enemyslowdown > 0) {
           enemyslowdown = -45
-          gs.BulletBuffer += gs.Swarm.swarmshoot()
+          if (!gs.Swarm.isEmpty) {
+            gs.BulletBuffer += gs.Swarm.swarmshoot() 
+          }
         }
 
         for (Bullet <- gs.BulletBuffer) {
@@ -346,15 +393,17 @@ var gsStack = new Stack[GameState]()
        gs.BulletBuffer --= BulletRemoveBuffer
 
        gsStack.push(gs.deepcopy())
-        println(rewindcounter)
-        if (gs.Swarm.isEmpty()) {
-
-          gs.Swarm = new EnemySwarm(6, 3)
-          gs.Swarm.display(g)
+        // println(rewindcounter)
+        if (gs.Swarm.isEmpty() && !showWaveClearScreen) {
+          showWaveClearScreen = true;
+          gs.waveClearTimer = 0
+          gs.WaveCount += 1
         }
 
          gs.Score = gs.killcounter*100 + gs.bulletinterception*25 //could do += for exponential growth
       }
+
+
 
       else{
 
@@ -373,12 +422,13 @@ var gsStack = new Stack[GameState]()
         
         
 
-   /*Background*/  g.drawImage(SpriteList.saturn, 0, 0)
-    /*Score*/      g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText("Score: "+gs.Score.toString(), canvas.width.value/3-220, canvas.height.value -750, 300)
-    /*Hearts*/     g.drawImage(SpriteList.Heart, 2*canvas.width.value/3 - 350, canvas.height.value - 785);g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText(gs.Lives.toString(), 2*canvas.width.value/3-270, canvas.height.value -750, 300)
-    /*Time*/       g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText(gs.Time.toString(), canvas.width.value/2 -250, canvas.height.value - 750, 100)
-    /*PowerBar*/   g.setFont(FontsLoaded.GemunuLibreExLi);g.setFill(Color.GhostWhite);g.fillText("Rewind Power Remaining: ", 3*canvas.width.value/4- 200, canvas.height.value-750, 275);g.setFill(Color.DarkRed);g.fillRect(78*canvas.width.value/100-100, canvas.height.value -780, (350*(rewindcounter/6000.0))-10, canvas.height.value-763);g.setStroke(Color.SkyBlue);g.strokeRect(78*canvas.width.value/100 -100, canvas.height.value -780, (350*(rewindcounter/6000.0))-10, canvas.height.value-763)
-    
+    /*Background*/  g.drawImage(SpriteList.Saturn, 0, 0)
+    /*Score*/      g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText("Score: "+gs.Score.toString(), canvas.width.value/3-330, canvas.height.value -750, 300)
+    /*Hearts*/     g.drawImage(SpriteList.Heart, 2*canvas.width.value/3 - 500, canvas.height.value - 785);g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText(gs.Lives.toString(), 2*canvas.width.value/3-420, canvas.height.value -750, 300)
+    /*WavesCleared*/g.fillText("Waves Cleared: " + gs.WaveCount.toString(), 2*canvas.width.value/3-270, canvas.height.value - 750, 200)
+    /*Time*/       g.setFont(FontsLoaded.GemunuLibreLight);g.setFill(Color.GhostWhite);g.fillText("Time: "+gs.Time.toString(), canvas.width.value/2 -375, canvas.height.value - 750, 120)
+/*PowerBar*/   g.setFont(FontsLoaded.GemunuLibreExLi);g.setFill(Color.GhostWhite);g.fillText("Rewind Power Remaining: ", 3*canvas.width.value/4 - 100, canvas.height.value-750, 275);g.setFill(Color.DarkRed);g.fillRect(78*canvas.width.value/100, canvas.height.value -780, (250*(rewindcounter/6000.0)), canvas.height.value-763);g.setStroke(Color.SkyBlue);g.strokeRect(78*canvas.width.value/100, canvas.height.value -780, (250*(rewindcounter/6000.0)), canvas.height.value-763)
+
         gs.Gamer.display(g)
         gs.Swarm.display(g)
         
@@ -386,7 +436,7 @@ var gsStack = new Stack[GameState]()
         for(Bullet <- gs.BulletBuffer){
           Bullet.display(g)
         }
-        println(rewindcounter)
+        // println(rewindcounter)
       }
 
 
@@ -463,9 +513,12 @@ object SpriteList {
 
   val AlienShipWhitepath = getClass().getResource("/Sprites/AlienShipWhite.png")
   val AlienShipWhite = new Image(AlienShipPurplepath.toString())
+  
+  val WinPicPath = getClass().getResource("/images/Trophy.png")
+  val Trophy = new Image(WinPicPath.toString())
 
-  val BackgroundPath = getClass().getResource("/images/saturn.png")
-  val saturn = new Image(BackgroundPath.toString())
+  val BackgroundPath = getClass().getResource("/images/Saturn.png")
+  val Saturn = new Image(BackgroundPath.toString())
   
   val DeadBackgroundPath = getClass().getResource("/images/deadastronaut.png")
   val DeadBackground = new Image(DeadBackgroundPath.toString())

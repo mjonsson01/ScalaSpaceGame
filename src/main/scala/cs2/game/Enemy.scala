@@ -20,12 +20,12 @@ class Enemy(pic:Image, var initPos:Vec2, private val bulletPic:Image) extends Sp
 
    }
 
-  def move(): Unit = {
+  def move(speedMultiplier: Double): Unit = {
     if(checkBounds(new Vec2(1080,720))){
       vel *= -1
   }
-    initPos.x += vel
-    initPos.y += vel
+    initPos.x += (vel * speedMultiplier)
+    initPos.y += (vel * speedMultiplier)
   }
 
 
